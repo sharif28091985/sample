@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sample Quiz</title>
+<style>
+body {background:#0d0d0d;color:#f1f1f1;font-family:Arial,sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;margin:0;padding:20px;}
+h1,h2 {color:#00f0ff;text-shadow:0 0 10px #00f0ff;text-align:center;}
+.quiz-container {background:#1a1a1a;padding:25px;border-radius:15px;box-shadow:0 0 20px #00f0ff33;max-width:600px;width:100%;margin-top:20px;}
+label {display:block;margin:10px 0;}
+input[type="text"] {width:100%;padding:8px;margin:5px 0;border-radius:5px;border:1px solid #00f0ff;background:#000;color:#fff;outline:none;}
+button {background:#00f0ff;color:#000;font-size:18px;padding:10px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;box-shadow:0 0 10px #00f0ff;margin-top:15px;}
+button:hover {background:#00d6e0;transform:scale(1.05);}
+.success-message {color:#00ff88;text-shadow:0 0 10px #00ff88;margin-top:15px;text-align:center;font-weight:bold;}
+</style>
+</head>
+<body>
+
+<h1>Sample Quiz</h1>
+
+<div class="quiz-container" id="studentInfoDiv">
+  <h2>Enter Your Details</h2>
+  <label>Name: <input type="text" id="studentName" required></label>
+  <label>Class: <input type="text" id="studentClass" required></label>
+  <label>Roll: <input type="text" id="studentRoll" required></label>
+  <button onclick="startQuiz()">Start Quiz</button>
+</div>
+
+<div class="quiz-container" id="quizDiv" style="display:none;">
+  <h2>MCQs Quiz</h2>
+  <form id="quizForm">
+    <label>1. What is the capital of Bangladesh?</label>
+    <input type="radio" name="q1" value="Dhaka"> Dhaka<br>
+    <input type="radio" name="q1" value="Chittagong"> Chittagong<br>
+    <input type="radio" name="q1" value="Sylhet"> Sylhet<br>
+
+    <label>2. 5 + 7 = ?</label>
+    <input type="radio" name="q2" value="10"> 10<br>
+    <input type="radio" name="q2" value="12"> 12<br>
+    <input type="radio" name="q2" value="14"> 14<br>
+
+    <label>3. The color of the sky is?</label>
+    <input type="radio" name="q3" value="Blue"> Blue<br>
+    <input type="radio" name="q3" value="Green"> Green<br>
+    <input type="radio" name="q3" value="Red"> Red<br>
+
+    <button type="button" onclick="submitQuiz()">Submit Quiz</button>
+  </form>
+  <div class="success-message" id="successMsg" style="display:none;"></div>
+</div>
+
+<script>
+let studentData = {};
+
+function startQuiz(){
+  const name = document.getElementById("studentName").value.trim();
+  const cls = document.getElementById("studentClass").value.trim();
+  const roll = document.getElementById("studentRoll").value.trim();
+
+  if(!name || !cls || !roll){
+    alert("Please fill all details!");
+    return;
+  }
+
+  studentData.name = name;
+  studentData.class = cls;
+  studentData.roll = roll;
+
+  document.getElementById("studentInfoDiv").style.display="none";
+  document.getElementById("quizDiv").style.display="block";
+}
+
+function submitQuiz(){
+  let score = 0;
+  const answers = {
+    q1: "Dhaka",
+    q2: "12",
+    q3: "Blue"
+  };
+
+  for(let q in answers){
+    const selected = document.querySelector(`input[name=${q}]:checked`);
+    if(selected && selected.value === answers[q]) score++;
+  }
+
+  // Send data to Google Sheet via Apps Script
+  const data = {
+    name: studentData.name,
+    class: studentData.class,
+    roll: studentData.roll,
+    score: score
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycbwO50Txf-DpHwwrghhfuaU77TxVQdqC-kFl856WMiewS7NjuvB0yhM_xxmLEGMy0bYQ/exec", {
+    method:"POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(res => {
+    if(res.status === "success"){
+      document.getElementById("successMsg").innerText = `✅ Quiz submitted! Your score: ${score}`;
+      document.getElementById("successMsg").style.display="block";
+      document.getElementById("quizForm").reset();
+    }else{
+      alert("Error: "+res.message);
+    }
+  })
+  .catch(err=>{
+    alert("Error connecting to server.");
+  });
+}
+</script>
+
+</body>
+</html>
