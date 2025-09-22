@@ -5,20 +5,75 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sample Quiz</title>
 <style>
-body {background:#0d0d0d;color:#f1f1f1;font-family:Arial,sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;margin:0;padding:20px;}
-h1,h2 {color:#00f0ff;text-shadow:0 0 10px #00f0ff;text-align:center;}
-.quiz-container {background:#1a1a1a;padding:25px;border-radius:15px;box-shadow:0 0 20px #00f0ff33;max-width:600px;width:100%;margin-top:20px;}
-label {display:block;margin:10px 0;}
-input[type="text"] {width:100%;padding:8px;margin:5px 0;border-radius:5px;border:1px solid #00f0ff;background:#000;color:#fff;outline:none;}
-button {background:#00f0ff;color:#000;font-size:18px;padding:10px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;box-shadow:0 0 10px #00f0ff;margin-top:15px;}
-button:hover {background:#00d6e0;transform:scale(1.05);}
-.success-message {color:#00ff88;text-shadow:0 0 10px #00ff88;margin-top:15px;text-align:center;font-weight:bold;}
+body {
+  background:#0d0d0d;
+  color:#f1f1f1;
+  font-family:Arial,sans-serif;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  min-height:100vh;
+  margin:0;
+  padding:20px;
+}
+h1,h2 {
+  color:#00f0ff;
+  text-shadow:0 0 10px #00f0ff;
+  text-align:center;
+}
+.quiz-container {
+  background:#1a1a1a;
+  padding:25px;
+  border-radius:15px;
+  box-shadow:0 0 20px #00f0ff33;
+  max-width:600px;
+  width:100%;
+  margin-top:20px;
+}
+label {
+  display:block;
+  margin:10px 0;
+}
+input[type="text"], input[type="number"] {
+  width:100%;
+  padding:8px;
+  margin:5px 0;
+  border-radius:5px;
+  border:1px solid #00f0ff;
+  background:#000;
+  color:#fff;
+  outline:none;
+}
+button {
+  background:#00f0ff;
+  color:#000;
+  font-size:18px;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+  box-shadow:0 0 10px #00f0ff;
+  margin-top:15px;
+}
+button:hover {
+  background:#00d6e0;
+  transform:scale(1.05);
+}
+.success-message {
+  color:#00ff88;
+  text-shadow:0 0 10px #00ff88;
+  margin-top:15px;
+  text-align:center;
+  font-weight:bold;
+}
 </style>
 </head>
 <body>
 
 <h1>Sample Quiz</h1>
 
+<!-- Student Info Form -->
 <div class="quiz-container" id="studentInfoDiv">
   <h2>Enter Your Details</h2>
   <label>Name: <input type="text" id="studentName" required></label>
@@ -27,6 +82,7 @@ button:hover {background:#00d6e0;transform:scale(1.05);}
   <button onclick="startQuiz()">Start Quiz</button>
 </div>
 
+<!-- Quiz Questions -->
 <div class="quiz-container" id="quizDiv" style="display:none;">
   <h2>MCQs Quiz</h2>
   <form id="quizForm">
@@ -84,7 +140,6 @@ function submitQuiz(){
     if(selected && selected.value === answers[q]) score++;
   }
 
-  // Send data to Google Sheet via Apps Script
   const data = {
     name: studentData.name,
     class: studentData.class,
@@ -92,6 +147,7 @@ function submitQuiz(){
     score: score
   };
 
+  // Use your Apps Script Web App link
   fetch("https://script.google.com/macros/s/AKfycbwO50Txf-DpHwwrghhfuaU77TxVQdqC-kFl856WMiewS7NjuvB0yhM_xxmLEGMy0bYQ/exec", {
     method:"POST",
     headers: {"Content-Type":"application/json"},
@@ -108,7 +164,8 @@ function submitQuiz(){
     }
   })
   .catch(err=>{
-    alert("Error connecting to server.");
+    alert("Error connecting to server. Make sure the Apps Script is deployed as 'Anyone, even anonymous'.");
+    console.error(err);
   });
 }
 </script>
